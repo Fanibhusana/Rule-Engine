@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule Engine Demo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Rule Engine Demo</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">Create Rule</div>
+        <div class="card-body">
+            <form id="ruleForm">
+                <div class="form-group">
+                    <label for="ruleString">Enter Rule:</label>
+                    <input type="text" class="form-control" id="ruleString" placeholder="e.g., (age > 30 AND department = 'Sales')">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Rule</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">Evaluate Rule</div>
+        <div class="card-body">
+            <form id="evalForm">
+                <div class="form-group">
+                    <label for="userData">Enter User Data (JSON format):</label>
+                    <textarea class="form-control" id="userData" rows="3" placeholder='e.g., {"age": 35, "department": "Sales"}'></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Evaluate Rule</button>
+            </form>
+            <div id="evaluationResult" class="mt-3"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('ruleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const ruleString = document.getElementById('ruleString').value;
+        fetch('/api/rules/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ruleString })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Rule Created:', data);
+            alert('Rule created successfully!');
+        })
+        .catch(error => console.error('Error creating rule:', error));
+    });
+
+    document.getElementById('evalForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const userData = document.getElementById('userData').value;
+        fetch('/api/rules/evaluate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: userData
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log('Evaluation Result:', result);
+            document.getElementById('evaluationResult').innerText = 'Evaluation Result: ' + (result ? 'True' : 'False');
+        })
+        .catch(error => {
+            console.error('Error evaluating rule:', error);
+            document.getElementById('evaluationResult').innerText = 'Error: ' + error;
+        });
+    });
+</script>
+
+</body>
+</html>
